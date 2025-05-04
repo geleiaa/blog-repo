@@ -19,9 +19,9 @@ gcc -z execstack -fno-stack-protector lab3C.c -o lab3C
 
 Running the binary we see that it asks for a username. And when I try to enter any username, I get "incorrect username":
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/runbin.png" width="300" height="300" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/runbin.png)
+
 
 
 Looking at the binary strings we see something interesting:
@@ -30,9 +30,9 @@ Looking at the binary strings we see something interesting:
 $ strings lab3C
 ```
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/binstrings.png" width="300" height="300" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/binstrings.png)
+
 
 
 
@@ -40,16 +40,16 @@ We see that the binary also asks for a password and probably this password and t
 
 We can also see a preview of the functions that binary uses:
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/binstrings2.png" width="100" height="100" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/binstrings2.png)
+
 
 
 Testing the username and password I get a slightly strange result...
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/testuserpass.png" width="300" height="300" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/testuserpass.png)
+
 
 
 It seems that the username is correct but the password is not, or could it be that the binary doesn't do anything at all?
@@ -126,9 +126,9 @@ And just before calling the function **verify_user_name** we can see that the us
 
 Looking at the disassembly of functions, we don't see much that is useful:
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/disasfuncs.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/disasfuncs.png)
+
 
 
 We see that the functions probably take the input and do a comparison using the **strncmp** function. If we consider what we saw in the strings, these functions must compare the inputs with the values ​​"rpisec" and "admin".
@@ -138,9 +138,9 @@ We see that the functions probably take the input and do a comparison using the 
 
 Following with what we already know, we first have to test whether any variable can be overflowed. Putting breakpoints in the verification functions right after the input goes to the binary and put a pattern on the inputs for see how it is handled.
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/breakfuncs.png" width="300" height="300" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/breakfuncs.png"
+
 
 
 Let's use the alphabet pattern like in the previous lab, so we know when there was a memory leak:
@@ -151,16 +151,16 @@ AAAAAAAABBBBBBBBCCCCCCCCDDDDDDDDEEEEEEEEFFFFFFFFGGGGGGGGHHHHHHHHIIIIIIIIJJJJJJJJ
 
 After a few steps in **verify_user_name** we stop at the **strcmp** function call and see the comparison with the string "rpisec". And we can also notice that one of **strcmp** arguments is "6", which would be the number of bytes that the function will validate.
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/verfname1.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/verfname1.png)
+
 
 
 So the first 6 bytes of the input have to be "rpisec". This can be confirmed because after we go through **strncmp** the flow jumps to a comparison and then print "incorrect username".
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/incorrname.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/incorrname.png)
+
 
 
 Then the execution is finished.
@@ -171,30 +171,30 @@ Then the execution is finished.
 So if we put the string "rpisec" before the pattern we see that **strncpm** only reads the first 6 bytes and with this it is possible to pass the username check.
 
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/passverifname.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/passverifname.png)
+
 
 
 After passing the username verification we arrive at the **verify_user_pass** function. And we can see the password verification being done:
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/verifpass1.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/verifpass1.png)
+
 
 
 As expected, after passing **strncmp** the flow jumps to a comparison and then to the end, but... 
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/incorrpass.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/incorrpass.png)
+
 
 
 I noticed that no return address was overwritten, neither from **verify_user_name** or **verify_user_pass**. Until we reached the return address of the main function, which got stuck because it was overwritten by our alphabet patter.
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/retmain.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/retmain.png)
+
 
 
 We can notice that after 88 bytes of the pattern the return address of main is overwritten. 
@@ -224,16 +224,16 @@ With this we can know that the username variable will not be stored in the stack
 
 If we look at the disassembly of the main function we see that the address of the username variable is referenced before being passed to the **fgets** function and then to the **verify_user_name** function.
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/usrnmvar1.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/usrnmvar1.png)
+
 
 
 And checking the variable's memory we see the string "rpisec".
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/usrnmvar2.png" width="500" height="500" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/usrnmvar2.png)
+
 
 
 Now knowing the address of the username variable and also how to overwrite the return address, let's write our exploit...
@@ -272,9 +272,9 @@ f.write(buf)
 After running the python code it sends the buffer to an "exp" file. And the exploration buffer looks like this:
 
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/expfile.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/expfile.png)
+
 
 
 
@@ -286,23 +286,23 @@ rpisec + shellcode + pattern + addr of shellcode
 
 After running we can see that the shellcode has been stored along with the rpisec string.
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/shellcode1.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/shellcode1.png)
+
 
 
 Arriving at the ret main we see that the return address was successfully overwritten.
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/shellcode2.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/shellcode2.png)
+
 
 
 Then we see that the shellcode address has been reached and the shellcode instructions are being executed successfully.
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/shellcode3.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/shellcode3.png)
+
 
 
 
@@ -318,9 +318,9 @@ $ sudo sysctl kernel.randomize_va_space=0
 
 Running the binary along with the exploit... we have the shell
 
-<div class="col-sm mt-3 mt-md-0">
-   {% include figure.liquid loading="eager" path="assets/img/pwned.png" class="img-fluid rounded z-depth-1" zoomable=true %}
-</div>
+
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/pwned.png)
+
 
 
 It was difficult but it worked. :)

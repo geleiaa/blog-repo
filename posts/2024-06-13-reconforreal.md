@@ -10,7 +10,7 @@ notes of [@jhaddix](https://twitter.com/Jhaddix) lives
 
 [https://book.hacktricks.xyz/generic-methodologies-and-resources/external-recon-methodology](https://book.hacktricks.xyz/generic-methodologies-and-resources/external-recon-methodology)
 
-{% include figure.liquid loading="eager" path="assets/img/path.png" width="500" height="500" class="img-fluid rounded z-depth-1" zoomable=true %}
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/path.png)
 
 > ## Assets discovery
 
@@ -23,11 +23,11 @@ notes of [@jhaddix](https://twitter.com/Jhaddix) lives
   - [ ] Intelx [https://intelx.io/tools](https://intelx.io/tools)
 
   
-  {% include figure.liquid loading="eager" path="assets/img/infodata.png" width="500" height="500" class="img-fluid rounded z-depth-1" zoomable=true %}
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/infodata.png)
 
   - [ ] search engines
 
-  {% include figure.liquid loading="eager" path="assets/img/searchengs.png" width="500" height="500" class="img-fluid rounded z-depth-1" zoomable=true %}
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/searchengs.png)
 
 
 - #### Encontre o ASN (se houver) de cada empresa, isso nos dará os intervalos de IP pertencentes a cada empresa
@@ -144,7 +144,7 @@ notes of [@jhaddix](https://twitter.com/Jhaddix) lives
 - #### [ ] Shodan passive recon
 
 
-{% include figure.liquid loading="eager" path="assets/img/shodanrsrc.png" width="500" height="500" class="img-fluid rounded z-depth-1" zoomable=true %}
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/shodanrsrc.png)
 
 
   - passive recon [https://github.com/pirxthepilot/wtfis](https://github.com/pirxthepilot/wtfis)
@@ -327,7 +327,7 @@ Google Cloud: [http://bit.ly/2HAsZFm](http://bit.ly/2HAsZFm)
 - [ ] ``` $ echo domains | subfinder -silent | httpx -silent | katana -silent -d 10 | unfurl keys | uro ```
 
 
-{% include figure.liquid loading="eager" path="assets/img/contdisclists.png" width="500" height="500" class="img-fluid rounded z-depth-1" zoomable=true %}
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/contdisclists.png)
 
 
 > ## [ ] Application Analysis
@@ -378,7 +378,7 @@ Google Cloud: [http://bit.ly/2HAsZFm](http://bit.ly/2HAsZFm)
   
 
 
-{% include figure.liquid loading="eager" path="assets/img/hotareasmap.png" width="500" height="500" class="img-fluid rounded z-depth-1" zoomable=true %}
+![a](https://github.com/geleiaa/blog-repo/blob/main/imgs/hotareasmap.png)
 
 
 - Adding more constantly...

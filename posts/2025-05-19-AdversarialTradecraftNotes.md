@@ -46,9 +46,9 @@ Essa leiturame deu uma visão mais ampla sobre tema e com certeza pode ajudar ou
 		- [PAM modules](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#pam-modules)
 
 - [Pivoting](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#pivoting)
-		- [SSH agent hijacking](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#ssh-agent-hijacking)
-		- [SSH ControlMaster hijacking](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#ssh-controlmaster-hijacking)
-		- [RDP hijacking](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#rdp-hijacking)
+	- [SSH agent hijacking](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#ssh-agent-hijacking)
+	- [SSH ControlMaster hijacking](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#ssh-controlmaster-hijacking)
+	- [RDP hijacking](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#rdp-hijacking)
 
 - [The Research Advantage](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#the-research-advantage)
 	- [Creative Pivoting](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#creative-pivoting)

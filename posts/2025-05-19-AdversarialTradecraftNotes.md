@@ -1,3 +1,69 @@
+### Offensive Key-points do livro https://www.amazon.com.br/Adversarial-Tradecraft-Cybersecurity-real-time-computer/dp/1801076200
+
+A ideia aqui é, depois de ler o livro, eu vi muitos pontos importantes que valem a pena serem passados a diante de forma direta e resumida para que o futuro leitor possa ter conhecimento disso e se aprofundar no assunto caso desejar. 
+
+O livro aborda as fases de um "Conflito Cibernetico" (como o autor diz), que é basicamente a interação dos times de ataque e defesa fazendo simulações de conflitos do mundo real. No livro existem varias taticas usadas por blue e red teams levando em consideração as experiencias do autor, que são muito boas por sinal. 
+
+Essa leiturame deu uma visão mais ampla sobre tema e com certeza pode ajudar outras pessoas também. Por isso eu decidi separar as partes que eu julguei mais importantes para o lado offensivo.
+
+
+- [Preparing for Battle](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#preparing-for-battle)
+	- [Essential Considerations](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#essential-considerations)
+		- [Long-term planning](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#long-term-planning)
+		- [Operational planning](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#operational-planning-and-opsec)
+		- [Scanning and Exploitation](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#scanning-and-exploitation)
+		- [Payload development](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#payload-development)
+
+- [Invisible is Best (Operating in Memory)](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#invisible-is-best-operating-in-memory)
+	- [Gaining the advantage](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#gaining-the-advantage)
+		- [Process injection](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#process-injection)
+
+- [Blending In](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#blending-in)
+	- [Persistence Options](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#persistence-options)
+		- [LOLbins](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#lolbins)
+		- [Executable file infection](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#executable-file-infection)
+	- [Covert command and control channels](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#covert-command-and-control-channels)
+		- [ICMP C2](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#icmp-c2)
+		- [DNS C2](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#dns-c2)
+		- [Domain fronting](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#domain-fronting)
+		- [Combining offensive techniques](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#combining-offensive-techniques)			
+
+- [Active Manipulation](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#active-manipulation)
+	- [Clearing logs](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#clearing-logs)
+	- [Hybrid approach](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#hybrid-approach)
+	- [Rootkits](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#rootkits)
+
+- [Real-Time Conflict](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#real-time-conflict)
+	- [Situational awareness](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#situational-awareness)
+		- [Clear the Bash history](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#clear-the-bash-history)
+		- [Abusing Docker](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#abusing-docker)
+	- [Gleaning operational information](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#gleaning-operational-information)
+		- [Keylogging](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#keylogging)
+		- [Screeshot spy](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#screeshot-spy)
+		- [Getting passwords](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#getting-passwords)
+		- [Searching files for secrets](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#searching-files-for-secrets)
+		- [Backdooring password utilities](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#backdooring-password-utilities)
+		- [PAM modules](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#pam-modules)
+
+- [Pivoting](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#pivoting)
+		- [SSH agent hijacking](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#ssh-agent-hijacking)
+		- [SSH ControlMaster hijacking](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#ssh-controlmaster-hijacking)
+		- [RDP hijacking](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#rdp-hijacking)
+
+- [The Research Advantage](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#the-research-advantage)
+	- [Creative Pivoting](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#creative-pivoting)
+
+- [Clearing the Field](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#clearing-the-field)
+	- [Exfiltration](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#exfiltration)
+		- [Protocol tunneling](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#protocol-tunneling)
+	- [Anonymity networks](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#anonymity-networks)
+		- [Public networks](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#public-networks)
+		- [Custom private anonymity networks](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#custom-private-anonymity-networks)
+	- [Ending the operation](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#ending-the-operation)
+		- [Taking down infrastructure](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#taking-down-infrastructure)					
+
+
+
 ## Preparing for Battle
 >___
 

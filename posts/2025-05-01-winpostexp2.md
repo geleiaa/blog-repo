@@ -313,11 +313,40 @@ De todas as refs essas aqui são as mais relevantes porque detalham como as quer
 - https://posts.specterops.io/manual-ldap-querying-part-2-8a65099e12e3
 
 
+## In-Memory execution 
+> ___
+
+
+Outra forma de furtividade ao executar ferramentas ou comandos é "em memoria". Existem varias técnicas para execução em memoria, mas todas elas necessitam de um processo ja existente na maquina alvo.
+
+Uma das tecnicas é a de Process Injection, geralmente usado em algum tipo de stager/dropper que executam um shellcode na memoria do proprio ou de outro processo para fazer callback no C2.
+
+Outras tecnicas envolvem usar um implant ja rodando para executar outras ferramentas da mesma forma, no proprio ou em criando outro. Essas tecnicas são usadas por varios C2 frameworks como o cobalt strike, sliver, metasploit, etc. Algumas delas são: Execute-Assembly, SideLoad, Reflective dll injection, entre outros.
+
+O c2 Sliver implementa essas tecnicas que podem ser usadas para pós-exploração. Elas são executadas na cli como execute-assembly, sideload, spawndll e tambem as extensões ou aliases, vou deixar referencias a baixo. 
+
+No Metasoploit você pode usar o modulo "shellcode_inject". Nesse modulo você precisa ter um sessão ativa e saber em qual processo na maquina alvo é possivel executar. Aqui tem um exemplo de como pode ser usado https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md#process-injection
+
+Assim como o cobaltstrike que é basicamente todos os modulos de pós-exploração são baseados em execução em memoria...
+
+
+- Sliver Extencions https://dominicbreuker.com/post/learning_sliver_c2_12_extensions/
+
+- Sliver Execute-Assembly https://dominicbreuker.com/post/learning_sliver_c2_09_execute_assembly/
+
+- Sliver Sideload https://dominicbreuker.com/post/learning_sliver_c2_10_sideload/
+
+- Sliver Reflective Dll https://dominicbreuker.com/post/learning_sliver_c2_11_spawndll/
+
+- MSF shellcode injec https://web.archive.org/web/20240313192232/https://iwantmore.pizza/posts/meterpreter-shellcode-inject.html
+
+- Cobaltstrike in memory execution https://www.cobaltstrike.com/blog/in-memory-evasion
 
 
 ## Tools for automate recon 
 > ___
 
+- Seatbelt https://github.com/GhostPack/Seatbelt
 
 - AdFind http://www.joeware.net/freetools/tools/adfind/
   - https://thedfirreport.com/2020/05/08/adfind-recon/

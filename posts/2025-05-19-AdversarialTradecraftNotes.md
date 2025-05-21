@@ -317,14 +317,14 @@ Neste capítulo, examinaremos diversas ferramentas e técnicas para nos ajudar a
 
 Até agora, temos operado na memória e contando com exploits para retornar aos nossos sistemas alvo. Nosso nível atual de acesso, da perspectiva do invasor, é extremamente tênue. Isso significa que podemos perder nossas sessões e acesso a qualquer momento, portanto, devemos persistir nosso acesso o mais rápido possível. Nossa persistência deve ser um canal de comunicação de longa distância ou um canal de fallback caso nosso acesso inicial seja perdido.
 
-• LOLbins
-• DLL search order hijacking
-• Executable file infection
-• Covert command and control (C2) channels
-• ICMP C2
-• DNS C2
-• Domain fronting
-• Combining offensive techniques
+- LOLbins
+- DLL search order hijacking
+- Executable file infection
+- Covert command and control (C2) channels
+- ICMP C2
+- DNS C2
+- Domain fronting
+- Combining offensive techniques
 
 
 #### LOLbins

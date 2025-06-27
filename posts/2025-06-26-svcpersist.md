@@ -30,6 +30,7 @@ A ideia é a seguinte, vamos partir do contexto de que você ja tenha uma shell 
 ```
 Os exemplos de comandos são de uma shell meterpreter, então as flags e as strings usadas podem variar dependendo do c2 ou da shell que você usar.
 
+(Obs: para facilitar o demo o defender foi desativado porque ele barraria facilmente a dll do msfvenom. Pra isso você pode usar tecnicas de obfuscação para o implant...)
 
 ### 2 - Create EvilSvc Service
 >__
@@ -78,7 +79,7 @@ reg.exe queryHKLM\SYSTEM\CurrentControlSet\services\EvilSvc\Parameters /v Servic
 
 - Nessa parte adicionamos o EvilSvc ao grupo DcomLaunch alterando a registry key ```HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Svchost /v DcomLaunch```. No artigo é feito direto pelo registry editor mas como só temos acesso via cli, vamos usar powershell pra isso.
 
-![setsvcdcom](https://github.com/geleiaa/blog-repo/blob/main/imgs/setsvcdcom.png)
+![setsvctodcom](https://github.com/geleiaa/blog-repo/blob/main/imgs/setsvctodcom.png)
 
 
 ```
@@ -101,7 +102,7 @@ Você pode juntar isso numa oneliner e executar como na imagem acima.
 
 - Depois verifique se o EvilSvc foi adicionado
 
-![verifysvcindcom](https://github.com/geleiaa/blog-repo/blob/main/imgs/verifysvcindcom)
+![verifysvcindcom](https://github.com/geleiaa/blog-repo/blob/main/imgs/verifysvcindcom.png)
 
 ```
 reg.exe query "HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Svchost" /v DcomLaunch

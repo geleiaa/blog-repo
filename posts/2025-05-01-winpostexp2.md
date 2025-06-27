@@ -364,5 +364,14 @@ Assim como o cobaltstrike que é basicamente todos os modulos de pós-exploraç�
   - https://docs.redhat.com/en/documentation/red_hat_directory_server/11/html/administration_guide/examples-of-common-ldapsearches#Examples-of-common-ldapsearches
 
 
+
+dsquery.exe * -filter "(objectCategory=Person)" -attr cn title displayName description department company sAMAccountName mail mobile telephoneNumber whenCreated whenChanged logonCount badPwdCount distinguishedName -L -limit 0
+dsquery.exe * -filter "(objectCategory=Computer)" -attr cn operatingSystem operatingSystemServicePack operatingSystemVersion dNSHostName whenCreated whenChanged lastLogonTimestamp distinguishedName description managedBy mS-DS-CreatorSID -limit 0
+dsquery.exe * -filter "(objectCategory=Computer)" -attr cn servicePrincipalName -L -limit 0
+dsquery.exe * -filter "(objectCategory=Group)" -uc -attr cn sAMAccountName distinguishedName description -limit 0
+dsquery.exe * -filter "(objectClass=organizationalUnit)" -attr ou name whenCreated distinguishedName gPLink -limit 0
+
+
+
 #### Conforme eu for achando e testando tecnicas e tools novas vou atualizar aqui.
 

